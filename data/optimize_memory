@@ -1,0 +1,42 @@
+def optimize_memory(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Optimise la mémoire du DataFrame en réduisant la précision des types numériques.
+    - float64 → float32
+    - int64   → int32
+    """
+    before = df.memory_usage(deep=True).sum() / 1024  # KB
+    df_opt = df.copy()
+
+    for col in df_opt.select_dtypes(include=['float64']).columns:
+        df_opt[col] = df_opt[col].astype('float32')
+
+    for col in df_opt.select_dtypes(include=['int64']).columns:
+        df_opt[col] = df_opt[col].astype('int32')
+
+    after = df_opt.memory_usage(deep=True).sum() / 1024  # KB
+
+    print(f'Mémoire avant  : {before:.2f} KB')
+    print(f'Mémoire après  : {after:.2f} KB')
+    print(f'Économie       : {before - after:.2f} KB ({(1 - after/before)*100:.1f}%)')
+    return df_opt
+
+
+df_optimized = optimize_memory(df)
+before_kb = df.memory_usage(deep=True).sum() / 1024
+after_kb  = df_optimized.memory_usage(deep=True).sum() / 1024
+
+fig, ax = plt.subplots(figsize=(7, 5))
+bars = ax.bar(['Avant\noptimisation', 'Après\noptimisation'],
+              [before_kb, after_kb],
+              color=['#e74c3c', '#2ecc71'], edgecolor='white', linewidth=2, width=0.5)
+
+for bar, val in zip(bars, [before_kb, after_kb]):
+    ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.3,
+            f'{val:.2f} KB', ha='center', fontweight='bold', fontsize=12)
+
+ax.set_title(f' Optimisation Mémoire — Économie de {(1-after_kb/before_kb)*100:.1f}%',
+             fontsize=13, fontweight='bold')
+ax.set_ylabel('Mémoire (KB)')
+ax.set_ylim(0, before_kb * 1.3)
+plt.tight_layout()
+plt.show()
