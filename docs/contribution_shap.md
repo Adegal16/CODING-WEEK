@@ -1,4 +1,4 @@
-# Rapport de Contribution - Explicabilité et Évaluation (Membre 3)
+# Rapport de Contribution - Explicabilité et Évaluation (SABIRI MOHAMED AMINE)
 
 ## 1. Ma contribution principale : Implémentation de SHAP
 Mon rôle principal a été de rendre notre modèle de prédiction du risque d'insuffisance cardiaque transparent et interprétable pour les médecins. J'ai développé entièrement le code source dans `src/evaluate_model.py` :
