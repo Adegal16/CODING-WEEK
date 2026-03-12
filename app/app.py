@@ -15,6 +15,20 @@ import pandas as pd
 import random
 import joblib
 import plotly.graph_objects as go
+from datetime import datetime
+from io import BytesIO
+import base64
+
+# PDF Generation imports
+try:
+    from reportlab.lib.pagesizes import letter, A4
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch, cm
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Image, Table, TableStyle
+    from reportlab.lib import colors
+    PDF_AVAILABLE = True
+except ImportError:
+    PDF_AVAILABLE = False
 
 # ─────────────────────────────────────────────
 # IMPORT SHAP DEPUIS src/evaluate_model.py
@@ -48,6 +62,183 @@ try:
     MODEL_AVAILABLE = True
 except Exception:
     pass  # → mode placeholder automatique
+
+# ─────────────────────────────────────────────
+# FONCTION DE GÉNÉRATION PDF
+# ─────────────────────────────────────────────
+def generate_pdf_report(patient_data: dict, result: dict, shap_summary_fig=None, shap_individual_fig=None) -> BytesIO:
+    """
+    Génère un rapport PDF contenant les données patient et la prédiction de risque.
+    
+    Parameters:
+    -----------
+    patient_data : dict - Données cliniques du patient
+    result : dict - Résultat de prédiction (probabilité, niveau de risque)
+    shap_summary_fig : matplotlib.figure.Figure - Graphique de synthèse SHAP (optionnel)
+    shap_individual_fig : matplotlib.figure.Figure - Graphique SHAP pour le patient (optionnel)
+    
+    Returns:
+    --------
+    BytesIO - Buffer PDF prêt pour téléchargement
+    """
+    if not PDF_AVAILABLE:
+        st.error("La génération de PDF n'est pas disponible. Installez reportlab avec: pip install reportlab")
+        return None
+    
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=0.5*inch, bottomMargin=0.5*inch)
+    story = []
+    
+    # Styles
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=24,
+        textColor=colors.HexColor('#1f6feb'),
+        spaceAfter=12,
+        alignment=1  # Center
+    )
+    heading_style = ParagraphStyle(
+        'CustomHeading',
+        parent=styles['Heading2'],
+        fontSize=14,
+        textColor=colors.HexColor('#000000'),
+        spaceAfter=10,
+        spaceBefore=10,
+        # no border or background to keep title simple
+        #borderPadding=8,
+        #backColor=colors.HexColor('#161b22'),
+    )
+    
+    # En-tête du rapport
+    story.append(Paragraph("CardioAI - Rapport de Prediction du Risque Cardiaque", title_style))
+    story.append(Spacer(1, 0.2*inch))
+    story.append(Paragraph(f"<b>Date du rapport :</b> {datetime.now().strftime('%d/%m/%Y a %H:%M')}", styles['Normal']))
+    story.append(Spacer(1, 0.3*inch))
+    
+    # Section 1 : Données du patient
+    story.append(Paragraph("1. Informations Cliniques du Patient", heading_style))
+    patient_table_data = [
+        ["Parametre", "Valeur"],
+        ["Age", f"{patient_data['age']:.0f} ans"],
+        ["Sexe", "Homme" if patient_data['sex'] == 1 else "Femme"],
+        ["Fraction d'ejection", f"{patient_data['ejection_fraction']:.1f}%"],
+        ["Creatinine srique", f"{patient_data['serum_creatinine']:.2f} mg/dL"],
+        ["Sodium srique", f"{patient_data['serum_sodium']:.0f} mEq/L"],
+        ["CPK", f"{patient_data['creatinine_phosphokinase']:.0f} mcg/L"],
+        ["Plaquettes", f"{patient_data['platelets']:,.0f} /mL"],
+        ["Suivi", f"{patient_data['time']:.0f} jours"],
+    ]
+    patient_table = Table(patient_table_data)
+    patient_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#d3d3d3')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 11),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.whitesmoke),
+        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('FONTSIZE', (0, 1), (-1, -1), 10),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.whitesmoke, colors.HexColor('#f0f0f0')]),
+    ]))
+    story.append(patient_table)
+    story.append(Spacer(1, 0.3*inch))
+    
+    # Section 2 : Facteurs de risque
+    story.append(Paragraph("2. Facteurs de Risque", heading_style))
+    risk_factors = [
+        ["Anemie", "OUI" if patient_data['anaemia'] else "NON"],
+        ["Diabete", "OUI" if patient_data['diabetes'] else "NON"],
+        ["Hypertension", "OUI" if patient_data['high_blood_pressure'] else "NON"],
+        ["Tabagisme", "OUI" if patient_data['smoking'] else "NON"],
+    ]
+    risk_table = Table(risk_factors, colWidths=[2.5*inch, 2.5*inch])
+    risk_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), colors.whitesmoke),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('ROWBACKGROUNDS', (0, 0), (-1, -1), [colors.whitesmoke, colors.HexColor('#f0f0f0')]),
+    ]))
+    story.append(risk_table)
+    story.append(Spacer(1, 0.3*inch))
+    
+    # Section 3 : Résultats de prédiction
+    story.append(Paragraph("3. Résultats de la Prédiction", heading_style))
+    
+    risk_color_map = {
+        "Élevé": "#f85149",
+        "Modéré": "#d29922",
+        "Faible": "#3fb950"
+    }
+    risk_color = risk_color_map.get(result['risk_level'], "#ffffff")
+    
+    result_text = f"""
+    <b>Niveau de Risque :</b> <font color="{risk_color}"><b>{result['risk_emoji']} {result['risk_level']}</b></font><br/>
+    <b>Probabilité de décès :</b> <font color="{risk_color}"><b>{result['probability']*100:.1f}%</b></font><br/>
+    <b>Modèle :</b> {'Modèle ML réel' if result['is_real'] else 'Simulation (Placeholder)'}
+    """
+    story.append(Paragraph(result_text, styles['Normal']))
+    story.append(Spacer(1, 0.2*inch))
+    
+    # Recommandation clinique
+    if result['risk_level'] == "Élevé":
+        recommendation = "[RISQUE ELEVE] Une consultation cardiologique urgente est recommandée."
+    elif result['risk_level'] == "Modéré":
+        recommendation = "[RISQUE MODERE] Une surveillance renforcée et un bilan complémentaire sont conseillés."
+    else:
+        recommendation = "[RISQUE FAIBLE] Le maintien d'un suivi médical régulier est recommandé."
+    
+    story.append(Paragraph(f"<b>Recommandation Clinique :</b> {recommendation}", styles['Normal']))
+    story.append(Spacer(1, 0.3*inch))
+    
+    # Section 4 : Graphiques SHAP (s'ils sont disponibles)
+    if shap_summary_fig or shap_individual_fig:
+        story.append(PageBreak())
+        story.append(Paragraph("4. Analyse SHAP - Explications de la Prediction", heading_style))
+        story.append(Spacer(1, 0.2*inch))
+        
+        # Graphique de synthèse SHAP
+        if shap_summary_fig:
+            try:
+                summary_buffer = BytesIO()
+                shap_summary_fig.savefig(summary_buffer, format='png', dpi=150, bbox_inches='tight', facecolor='white')
+                summary_buffer.seek(0)
+                story.append(Paragraph("<b>Graphique de Synthese SHAP (Vue Globale)</b>", styles['Heading3']))
+                img_summary = Image(summary_buffer, width=6*inch, height=3*inch)
+                story.append(img_summary)
+                story.append(Spacer(1, 0.2*inch))
+            except Exception as e:
+                story.append(Paragraph(f"<i>Erreur lors de l'inclusion du graphique SHAP: {e}</i>", styles['Normal']))
+        
+        # Graphique individuel SHAP
+        if shap_individual_fig:
+            try:
+                individual_buffer = BytesIO()
+                shap_individual_fig.savefig(individual_buffer, format='png', dpi=150, bbox_inches='tight', facecolor='white')
+                individual_buffer.seek(0)
+                story.append(Paragraph("<b>Graphique SHAP pour ce Patient (Waterfall)</b>", styles['Heading3']))
+                img_individual = Image(individual_buffer, width=6*inch, height=3*inch)
+                story.append(img_individual)
+                story.append(Spacer(1, 0.2*inch))
+            except Exception as e:
+                story.append(Paragraph(f"<i>Erreur lors de l'inclusion du graphique SHAP individuel: {e}</i>", styles['Normal']))
+    
+    # Footer
+    story.append(Spacer(1, 0.5*inch))
+    footer_text = "CardioAI • Centrale Casablanca • Coding Week Mars 2026"
+    story.append(Paragraph(f"<i style='font-size: 8pt; color: #8b949e;'>{footer_text}</i>", styles['Normal']))
+    
+    # Build PDF
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
 
 # ─────────────────────────────────────────────
 # CONFIG PAGE
@@ -467,37 +658,47 @@ if predict_btn:
 
         # ── BOUTON TÉLÉCHARGEMENT PDF ──
         st.markdown("---")
-        if st.button(" Télécharger Rapport PDF"):
-            with st.spinner("Génération du rapport PDF..."):
+        
+        # Fonction de callback pour générer le PDF
+        def generate_and_download_pdf():
+            """Callback pour générer le PDF lors du téléchargement"""
+            shap_summary_fig = None
+            shap_individual_fig = None
+
+            if MODEL_AVAILABLE and SHAP_AVAILABLE:
                 try:
-                    # Générer les graphiques SHAP si disponibles
-                    shap_summary_fig = None
-                    shap_individual_fig = None
-
-                    if MODEL_AVAILABLE and SHAP_AVAILABLE:
-                        patient_df = pd.DataFrame([patient_data])[FEATURE_ORDER]
-                        patient_scaled = pd.DataFrame(
-                            scaler.transform(patient_df), columns=FEATURE_ORDER
-                        )
-                        shap_summary_fig = generate_shap_summary(model, X_train_scaled)
-                        shap_individual_fig = generate_shap_individual(model, X_train_scaled, patient_scaled)
-
-                    # Générer le PDF
-                    pdf_buffer = generate_pdf_report(
-                        patient_data, result, shap_summary_fig, shap_individual_fig
+                    patient_df = pd.DataFrame([patient_data])[FEATURE_ORDER]
+                    patient_scaled = pd.DataFrame(
+                        scaler.transform(patient_df), columns=FEATURE_ORDER
                     )
-
-                    # Bouton de téléchargement
-                    st.download_button(
-                        label="📥 Télécharger le Rapport PDF",
-                        data=pdf_buffer,
-                        file_name=f"Rapport_CardioAI_Patient_{age}ans_{result['risk_level']}.pdf",
-                        mime="application/pdf",
-                        key="pdf_download"
-                    )
-
+                    shap_summary_fig = generate_shap_summary(model, X_train_scaled)
+                    shap_individual_fig = generate_shap_individual(model, X_train_scaled, patient_scaled)
                 except Exception as e:
-                    st.error(f"Erreur lors de la génération du PDF : {e}")
+                    st.warning(f"⚠️ Impossible d'inclure les graphiques SHAP : {e}")
+
+            # Générer le PDF
+            pdf_buffer = generate_pdf_report(
+                patient_data, result, shap_summary_fig, shap_individual_fig
+            )
+            return pdf_buffer
+        
+        # Bouton de téléchargement direct
+        try:
+            pdf_data = generate_and_download_pdf()
+            
+            if pdf_data is not None:
+                st.download_button(
+                    label="📥 Télécharger le Rapport PDF",
+                    data=pdf_data,
+                    file_name=f"Rapport_CardioAI_Patient_{age}ans_{result['risk_level']}.pdf",
+                    mime="application/pdf",
+                    key="pdf_download_btn"
+                )
+            else:
+                st.error("❌ Erreur : Impossible de générer le PDF. Vérifiez que reportlab est installé.")
+        except Exception as e:
+            st.error(f"❌ Erreur lors de la génération du PDF : {str(e)}")
+
 
 else:
     # ── État initial ──
