@@ -147,13 +147,13 @@ handle_missing_values(df)
 print('\n ÉTAPE 3 — Détection des outliers...')
 handle_outliers(df)
     
-# ÉTAPE 4 — Équilibrer les classes
-print('\n  ÉTAPE 4 — Équilibrage des classes...')
-df = handle_imbalance(df)
-    
-# ÉTAPE 5 — Séparer train / test
-print('\n  ÉTAPE 5 — Séparation train / test...')
+# ÉTAPE 4 — Séparer train / test
+print('\n  ÉTAPE 4 — Séparation train / test...')
 X_train, X_test, y_train, y_test = split_data(df)
+
+# ÉTAPE 5 — Équilibrer les classes (SMOTE sur train seulement)
+print('\n  ÉTAPE 5 — Équilibrage des classes (train only)...')
+X_train, y_train = apply_smote(X_train, y_train)
     
 print()
 print('=' * 50)
