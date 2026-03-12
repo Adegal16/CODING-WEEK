@@ -6,7 +6,8 @@ lightgbm
 imbalanced-learn
 joblib
 shap
-streamlit
+streamlit>=1.30.0
 plotly
 matplotlib
 seaborn
+altair<6
