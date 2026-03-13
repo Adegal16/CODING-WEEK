@@ -205,7 +205,7 @@ Le mode bascule **automatiquement** sans aucune modification du code.
 - En mode démonstration : bar chart simulé Plotly
 
 ### Onglet 3 — Récapitulatif Patient
-- Fiche patient complète (données numériques + facteurs de risque ✅/❌)
+- Fiche patient complète (données numériques + facteurs de risque )
 - ** Export PDF** via `reportlab` incluant :
   - Données cliniques du patient
   - Résultat + recommandation clinique
@@ -213,7 +213,7 @@ Le mode bascule **automatiquement** sans aucune modification du code.
 
 ---
 
-## 📈 Modèles et performances
+##  Modèles et performances
 
 | Modèle | Accuracy | Precision | Recall | F1 | ROC-AUC |
 |--------|----------|-----------|--------|----|---------|
