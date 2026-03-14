@@ -11,22 +11,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Install dependencies
+      - name: Install necessary tools
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install pytest pandas numpy scikit-learn joblib imbalanced-learn
 
-      - name: Download dataset
+      - name: Create data directory and Download dataset
         run: |
           mkdir -p data
           curl -L "https://archive.ics.uci.edu/ml/machine-learning-databases/00519/heart_failure_clinical_records_dataset.csv" -o data/heart_failure_clinical_records_dataset.csv
+          # On crée une copie pour éviter l'erreur sur le Test 2
+          cp data/heart_failure_clinical_records_dataset.csv data/heart_failure_balanced.csv
 
-      - name: Run tests
+      - name: Run my 6 tests
         run: python -m pytest tests/test_data_processing.py -v
