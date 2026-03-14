@@ -1,44 +1,62 @@
-# Rapport de Contribution Personnelle — Projet AgroScan
-[cite_start]**Rôle : Lead DevOps & Assurance Qualité** [cite: 1]
+# Contribution Personnelle : Lead DevOps & Assurance Qualite
+
+## Introduction
+
+Dans le cadre de ce projet, mon objectif n'etait pas seulement de produire du code, mais de transformer nos scripts de recherche en une application robuste, fiable et industrialisable. J'ai agi comme le garant de l'integrite du projet en mettant en place une infrastructure capable de detecter les erreurs avant qu'elles ne deviennent critiques. Ma mission s'est articulee autour de trois axes : l'automatisation, l'efficience technique et la validation scientifique.
 
 ---
 
-## [cite_start]**Introduction** [cite: 2]
+## 1. Automatisation via le Pipeline CI/CD (GitHub Actions)
 
-[cite_start]Dans le cadre de ce projet, mon objectif n'était pas seulement de produire du code, mais de transformer nos scripts de recherche en une **application robuste, fiable et industrialisable**[cite: 3]. [cite_start]J'ai agi comme le garant de l'intégrité du projet en mettant en place une infrastructure capable de détecter les erreurs avant qu'elles ne deviennent critiques[cite: 4]. [cite_start]Ma mission s'est articulée autour de trois axes : **l'automatisation, l'efficience technique et la validation scientifique**[cite: 5].
+**Le Defi Technique :** En travail collaboratif, chaque "push" de code peut briser une fonctionnalite existante. Le test manuel est chronophage et source d'erreurs humaines.
 
----
+**La Solution :** J'ai configure un pipeline d'Integration Continue (CI) via un workflow YAML. A chaque modification, une machine virtuelle Linux (Ubuntu-latest) est instanciee dans le cloud pour compiler le projet et lancer les tests. Le pipeline inclut egalement une etape de telechargement automatique du dataset UCI directement depuis la source officielle, garantissant ainsi que les tests disposent toujours de donnees reelles sans dependre d'un fichier local.
 
-### **1. [cite_start]Automatisation via le Pipeline CI/CD (GitHub Actions)** [cite: 6]
-
-- [cite_start]**Le Défi Technique :** En travail collaboratif, chaque "push" de code peut briser une fonctionnalité existante[cite: 7]. [cite_start]Le test manuel est chronophage et source d'erreurs humaines[cite: 8].
-- [cite_start]**La Solution :** J'ai configuré un pipeline d'Intégration Continue (CI) via un workflow **YAML**[cite: 9]. [cite_start]À chaque modification, une machine virtuelle **Linux (Ubuntu-latest)** est instanciée dans le cloud pour compiler le projet et lancer les tests[cite: 10].
-- [cite_start]**Le Résultat :** Une visibilité totale sur la santé du projet[cite: 11]. [cite_start]Le code n'est plus "supposé marcher", il est "prouvé fonctionnel" par un environnement neutre et automatisé[cite: 12].
+**Le Resultat :** Une visibilite totale sur la sante du projet. Le code n'est plus "suppose marcher", il est "prouve fonctionnel" par un environnement neutre et automatise.
 
 ---
 
-### **2. [cite_start]Optimisation de l'Empreinte Mémoire (`optimize_memory.py`)** [cite: 13]
+## 2. Optimisation de l'Empreinte Memoire (`optimize_memory.py`)
 
-- [cite_start]**Le Défi Technique :** Les jeux de données de santé peuvent saturer la RAM, limitant l'usage du projet à des machines puissantes[cite: 14].
-- [cite_start]**La Solution :** J'ai développé un algorithme de **Downcasting**[cite: 15]. [cite_start]En analysant les plages de valeurs, le script convertit les types lourds (ex: `float64`) en types plus légers (`float32` ou `int16`) sans aucune perte de précision pour le modèle[cite: 15].
-- [cite_start]**Le Résultat :** Une réduction de **40% à 60% de la consommation RAM**, permettant au projet de tourner sur n'importe quel ordinateur portable ou serveur léger (**Edge Computing**)[cite: 18].
+**Le Defi Technique :** Les jeux de donnees de sante peuvent saturer la RAM, limitant l'usage du projet a des machines puissantes.
 
----
+**La Solution :** J'ai developpe et implemente un algorithme de Downcasting dans un module dedie `src/optimize_memory.py`. En analysant les plages de valeurs, le script convertit les types lourds (`float64`) en types plus legers (`float32`) et les entiers (`int64`) en (`int32`) sans aucune perte de precision pour le modele.
 
-### **3. [cite_start]Architecture de la Suite de Tests Qualité (`pytest`)** [cite: 19]
-
-[cite_start]J'ai conçu une batterie de tests couvrant l'intégralité du cycle de vie de la donnée[cite: 20]. [cite_start]Voici le détail des tests mis en place : [cite: 21]
-
-- [cite_start]**Tests d'Intégrité des Données (`test_missing_values`) :** Vérifie que le processus de nettoyage a bien traité tous les points aberrants[cite: 22]. [cite_start]Il garantit qu'aucune valeur nulle (**NaN**) ne parvient au modèle, ce qui provoquerait un crash en production[cite: 23].
-- [cite_start]**Tests de Cohérence Statistique (`test_smote_balancing`) :** Valide que l'algorithme SMOTE a correctement rééquilibré nos classes[cite: 25]. [cite_start]Le test vérifie que le ratio est strictement de **50/50**, point crucial pour éviter les biais de prédiction[cite: 26].
-- [cite_start]**Tests de Méthodologie Scientifique (`test_data_split`) :** S'assure que la séparation "**Entraînement/Test**" respecte les proportions et que les fichiers `train.csv` et `test.csv` sont physiquement créés et exploitables[cite: 27].
-- [cite_start]**Tests de Performance Brute (`test_memory_reduction`) :** Un test de non-régression qui compare la taille du DataFrame avant et après optimisation pour valider l'efficacité de mon script[cite: 28].
-- [cite_start]**Tests de "Sanity Check" du Modèle (`test_model_production`) :** Vérifie que le modèle final génère des probabilités valides (comprises entre **0** et **1**) et que le scaler est compatible avec les nouvelles données entrantes[cite: 29].
+**Le Resultat :** Une reduction de 40% a 60% de la consommation RAM, permettant au projet de tourner sur n'importe quel ordinateur portable ou serveur leger.
 
 ---
 
-## [cite_start]**Conclusion** [cite: 30]
+## 3. Architecture de la Suite de Tests Qualite (`pytest`)
 
-[cite_start]Mon intervention a permis d'élever le standard de ce projet : d'un simple exercice de Data Science, nous sommes passés à un **logiciel fiable**[cite: 31]. [cite_start]En automatisant la surveillance (**CI/CD**) et en optimisant les ressources (**Memory**), j'ai sécurisé le travail de mes collègues et garanti la **scalabilité** de notre solution[cite: 32].
+J'ai concu une batterie de tests couvrant l'integralite du cycle de vie de la donnee :
 
-[cite_start]La réussite des tests automatisés sur GitHub est la preuve technique que notre pipeline de données est prêt à être déployé dans un environnement réel, avec une confiance totale dans la stabilité des résultats[cite: 33].
+| Test | Fonction testee | Objectif |
+|------|----------------|----------|
+| `test_missing_values` | `handle_missing_values()` | Garantir qu'aucun NaN ne parvient au modele |
+| `test_outliers_integrity` | `handle_outliers()` | Verifier qu'aucune ligne n'est supprimee |
+| `test_smote_balancing` | `handle_imbalance()` | Valider l'equilibre 50/50 des classes |
+| `test_data_split` | `split_data()` | Verifier le split 80/20 et la creation des CSV |
+| `test_memory_reduction` | `optimize_memory()` | Valider la reduction effective de la memoire |
+| `test_model_production` | `best_model.pkl` | Verifier que les predictions sont 0 ou 1 |
+
+---
+
+## 4. Difficultes Rencontrees et Solutions Apportees
+
+**Conflits d'environnement Python :** Mon PC possede plusieurs versions de Python. La commande `pytest` n'etait pas reconnue car les bibliotheques etaient installees dans le mauvais environnement. Solution : utiliser systematiquement `python -m pytest` apres activation du venv `.venv`.
+
+**Fonction `optimize_memory()` manquante :** Le brief demandait explicitement de tester cette fonction, mais elle n'avait pas ete implementee. J'ai pris l'initiative de creer un module dedie `src/optimize_memory.py` pour debloquer les tests sans attendre.
+
+**Fonctions sans valeur de retour :** Les fonctions `handle_missing_values()` et `handle_outliers()` ne retournaient pas le DataFrame modifie, causant des `AttributeError` dans GitHub Actions. J'ai identifie le bug et propose l'ajout du `return df` manquant.
+
+**Dataset absent sur GitHub Actions :** Les tests echouaient sur le serveur distant car le fichier CSV n'etait pas versionne dans le repo. Solution : ajout d'une etape de telechargement automatique dans le pipeline CI/CD via `curl` directement dans `ci.yml`.
+
+**Incompatibilite de versions scikit-learn :** Le modele avait ete sauvegarde avec `sklearn 1.8.0` alors que le serveur GitHub utilisait `sklearn 1.7.2`. J'ai detecte et signale cette incompatibilite pour uniformiser les versions dans `requirements.txt`.
+
+---
+
+## Conclusion
+
+Mon intervention a permis d'elever le standard de ce projet : d'un simple exercice de Data Science, nous sommes passes a un logiciel fiable. En automatisant la surveillance (CI/CD) et en optimisant les ressources (Memory), j'ai securise le travail de mes collegues et garanti la scalabilite de notre solution.
+
+La reussite des tests automatises sur GitHub est la preuve technique que notre pipeline de donnees est pret a etre deploye dans un environnement reel, avec une confiance totale dans la stabilite des resultats.
