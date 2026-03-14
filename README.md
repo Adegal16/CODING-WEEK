@@ -170,7 +170,7 @@ CardioAI est une application web clinique qui prédit le **risque de décès par
 ##  Architecture du projet
 
 ```
-heart-failure-prediction/
+CODING-WEEK/
 │
 ├── data/
 │   ├── train.csv                  # Données d'entraînement (80%)
