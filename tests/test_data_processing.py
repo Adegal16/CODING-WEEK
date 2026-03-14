@@ -55,7 +55,7 @@ def test_smote_balancing():
 
 # ============================================================
 # TEST 4 - Split train / test
-# Verifie la structure et la creation des fichiers CSV
+# Verifie la structure et la création des fichiers CSV
 # ============================================================
 def test_data_split():
     df = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
