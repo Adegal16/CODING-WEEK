@@ -1,35 +1,44 @@
-## **Introduction**
-
-Dans le cadre de ce projet, mon objectif n'était pas seulement de produire du code, mais de transformer nos scripts de recherche en une **application robuste, fiable et industrialisable**. J'ai agi comme le garant de l'intégrité du projet en mettant en place une infrastructure capable de détecter les erreurs avant qu'elles ne deviennent critiques. 
-
----
-
-### **1. Automatisation via le Pipeline CI/CD (GitHub Actions)**
-
-- **Le Défi Technique :** En travail collaboratif, chaque "push" de code peut briser une fonctionnalité existante. Le test manuel est chronophage et source d'erreurs humaines.
-- **La Solution :** J'ai configuré un pipeline d'Intégration Continue (CI) via un workflow **YAML**. À chaque modification, une machine virtuelle **Linux (Ubuntu-latest)** est instanciée dans le cloud pour compiler le projet et lancer les tests.
-- **Le Résultat :** Une visibilité totale sur la santé du projet. Le code n'est plus "supposé marcher", il est "prouvé fonctionnel" par un environnement neutre et automatisé.
-
-### **2. Optimisation de l'Empreinte Mémoire (`optimize_memory.py`)**
-
-- **Le Défi Technique :** Les jeux de données de santé peuvent saturer la RAM, limitant l'usage du projet à des machines puissantes.
-- **La Solution :** J'ai développé un algorithme de **Downcasting**. En analysant les plages de valeurs, le script convertit les types lourds (ex: `float64`) en types plus légers (`float32` ou `int16`) sans aucune perte de précision pour le modèle.
-- **Le Résultat :** Une réduction de **40% à 60% de la consommation RAM**, permettant au projet de tourner sur n'importe quel ordinateur portable ou serveur léger (Edge Computing).
-
-### **3. Architecture de la Suite de Tests Qualité (`pytest`)**
-
-J'ai conçu une batterie de tests couvrant l'intégralité du cycle de vie de la donnée. Voici le détail des tests mis en place :
-
-- **Tests d'Intégrité des Données (`test_missing_values`) :** Vérifie que le processus de nettoyage a bien traité tous les points aberrants. Il garantit qu'aucune valeur nulle (NaN) ne parvient au modèle, ce qui provoquerait un crash en production.
-- **Tests de Cohérence Statistique (`test_smote_balancing`) :** Valide que l'algorithme SMOTE a correctement rééquilibré nos classes. Le test vérifie que le ratio est strictement de **50/50**, point crucial pour éviter les biais de prédiction.
-- **Tests de Méthodologie Scientifique (`test_data_split`) :** S'assure que la séparation "Entraînement/Test" respecte les proportions et que les fichiers `train.csv` et `test.csv` sont physiquement créés et exploitables.
-- **Tests de Performance Brute (`test_memory_reduction`) :** Un test de non-régression qui compare la taille du DataFrame avant et après optimisation pour valider l'efficacité de mon script.
-- **Tests de "Sanity Check" du Modèle (`test_model_production`) :** Vérifie que le modèle final génère des probabilités valides (comprises entre **0** et **1**) et que le scaler est compatible avec les nouvelles données entrantes.
+# Rapport de Contribution Personnelle — Projet AgroScan
+[cite_start]**Rôle : Lead DevOps & Assurance Qualité** [cite: 1]
 
 ---
 
-### **Conclusion**
+## [cite_start]**Introduction** [cite: 2]
 
-Mon intervention a permis d'élever le standard de ce projet : d'un simple exercice de Data Science, nous sommes passés à un **logiciel fiable**. En automatisant la surveillance (CI/CD) et en optimisant les ressources (Memory), j'ai sécurisé le travail de mes collègues et garanti la **scalabilité** de notre solution.
+[cite_start]Dans le cadre de ce projet, mon objectif n'était pas seulement de produire du code, mais de transformer nos scripts de recherche en une **application robuste, fiable et industrialisable**[cite: 3]. [cite_start]J'ai agi comme le garant de l'intégrité du projet en mettant en place une infrastructure capable de détecter les erreurs avant qu'elles ne deviennent critiques[cite: 4]. [cite_start]Ma mission s'est articulée autour de trois axes : **l'automatisation, l'efficience technique et la validation scientifique**[cite: 5].
 
-La réussite des tests automatisés sur GitHub est la preuve technique que notre pipeline de données est prêt à être déployé dans un environnement réel, avec une confiance totale dans la stabilité des résultats.
+---
+
+### **1. [cite_start]Automatisation via le Pipeline CI/CD (GitHub Actions)** [cite: 6]
+
+- [cite_start]**Le Défi Technique :** En travail collaboratif, chaque "push" de code peut briser une fonctionnalité existante[cite: 7]. [cite_start]Le test manuel est chronophage et source d'erreurs humaines[cite: 8].
+- [cite_start]**La Solution :** J'ai configuré un pipeline d'Intégration Continue (CI) via un workflow **YAML**[cite: 9]. [cite_start]À chaque modification, une machine virtuelle **Linux (Ubuntu-latest)** est instanciée dans le cloud pour compiler le projet et lancer les tests[cite: 10].
+- [cite_start]**Le Résultat :** Une visibilité totale sur la santé du projet[cite: 11]. [cite_start]Le code n'est plus "supposé marcher", il est "prouvé fonctionnel" par un environnement neutre et automatisé[cite: 12].
+
+---
+
+### **2. [cite_start]Optimisation de l'Empreinte Mémoire (`optimize_memory.py`)** [cite: 13]
+
+- [cite_start]**Le Défi Technique :** Les jeux de données de santé peuvent saturer la RAM, limitant l'usage du projet à des machines puissantes[cite: 14].
+- [cite_start]**La Solution :** J'ai développé un algorithme de **Downcasting**[cite: 15]. [cite_start]En analysant les plages de valeurs, le script convertit les types lourds (ex: `float64`) en types plus légers (`float32` ou `int16`) sans aucune perte de précision pour le modèle[cite: 15].
+- [cite_start]**Le Résultat :** Une réduction de **40% à 60% de la consommation RAM**, permettant au projet de tourner sur n'importe quel ordinateur portable ou serveur léger (**Edge Computing**)[cite: 18].
+
+---
+
+### **3. [cite_start]Architecture de la Suite de Tests Qualité (`pytest`)** [cite: 19]
+
+[cite_start]J'ai conçu une batterie de tests couvrant l'intégralité du cycle de vie de la donnée[cite: 20]. [cite_start]Voici le détail des tests mis en place : [cite: 21]
+
+- [cite_start]**Tests d'Intégrité des Données (`test_missing_values`) :** Vérifie que le processus de nettoyage a bien traité tous les points aberrants[cite: 22]. [cite_start]Il garantit qu'aucune valeur nulle (**NaN**) ne parvient au modèle, ce qui provoquerait un crash en production[cite: 23].
+- [cite_start]**Tests de Cohérence Statistique (`test_smote_balancing`) :** Valide que l'algorithme SMOTE a correctement rééquilibré nos classes[cite: 25]. [cite_start]Le test vérifie que le ratio est strictement de **50/50**, point crucial pour éviter les biais de prédiction[cite: 26].
+- [cite_start]**Tests de Méthodologie Scientifique (`test_data_split`) :** S'assure que la séparation "**Entraînement/Test**" respecte les proportions et que les fichiers `train.csv` et `test.csv` sont physiquement créés et exploitables[cite: 27].
+- [cite_start]**Tests de Performance Brute (`test_memory_reduction`) :** Un test de non-régression qui compare la taille du DataFrame avant et après optimisation pour valider l'efficacité de mon script[cite: 28].
+- [cite_start]**Tests de "Sanity Check" du Modèle (`test_model_production`) :** Vérifie que le modèle final génère des probabilités valides (comprises entre **0** et **1**) et que le scaler est compatible avec les nouvelles données entrantes[cite: 29].
+
+---
+
+## [cite_start]**Conclusion** [cite: 30]
+
+[cite_start]Mon intervention a permis d'élever le standard de ce projet : d'un simple exercice de Data Science, nous sommes passés à un **logiciel fiable**[cite: 31]. [cite_start]En automatisant la surveillance (**CI/CD**) et en optimisant les ressources (**Memory**), j'ai sécurisé le travail de mes collègues et garanti la **scalabilité** de notre solution[cite: 32].
+
+[cite_start]La réussite des tests automatisés sur GitHub est la preuve technique que notre pipeline de données est prêt à être déployé dans un environnement réel, avec une confiance totale dans la stabilité des résultats[cite: 33].
