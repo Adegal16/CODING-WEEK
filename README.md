@@ -4,7 +4,7 @@
 > **Centrale Casablanca — Coding Week 09-15 Mars 2026 — Equipe 6**
 ---
 
-## 📋 Table des matières
+##  Table des matières
 - [Quick Start](#-quick-start)
 - [Description](#-description)
 - [Dataset](#-dataset)
@@ -210,7 +210,7 @@ heart-failure-prediction/
 
 ---
 
-## 🖥️ Fonctionnalités de l'interface de l'interface
+##  Fonctionnalités de l'interface de l'interface
 
 ### Sidebar — Saisie patient
 - **7 inputs numériques** : âge, fraction d'éjection, créatinine sérique, sodium sérique, CPK, plaquettes, suivi
