@@ -25,7 +25,7 @@ if not os.path.exists(DATA_PATH):
 # TEST 1 - Gestion des valeurs manquantes
 # ============================================================
 def test_missing_values():
-    df = pd.read_csv(DATA_PATH)
+    df = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
     df_cleaned = handle_missing_values(df.copy())
     assert df_cleaned is not None
     assert df_cleaned.isnull().sum().sum() == 0
@@ -36,7 +36,7 @@ def test_missing_values():
 # Verifie qu aucune ligne n est supprimee apres traitement
 # ============================================================
 def test_outliers_integrity():
-    df = pd.read_csv(DATA_PATH)
+    df = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
     df_result = handle_outliers(df.copy())
     assert df_result is not None
     assert 'creatinine_phosphokinase' in df_result.columns
@@ -47,7 +47,7 @@ def test_outliers_integrity():
 # Verifie que les classes 0 et 1 sont egales apres SMOTE
 # ============================================================
 def test_smote_balancing():
-    df = pd.read_csv(DATA_PATH)
+    df = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
     df_balanced = handle_imbalance(df.copy())
     counts = df_balanced['DEATH_EVENT'].value_counts()
     assert counts[0] == counts[1]
@@ -58,7 +58,7 @@ def test_smote_balancing():
 # Verifie la structure et la creation des fichiers CSV
 # ============================================================
 def test_data_split():
-    df = pd.read_csv(DATA_PATH)
+    df = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
     X_train, X_test, y_train, y_test = split_data(df.copy())
     assert len(X_train) > len(X_test)
     assert X_train.shape[1] == 12
@@ -73,7 +73,7 @@ def test_data_split():
 # float64 -> float32 / int64 -> int32
 # ============================================================
 def test_memory_reduction():
-    df = pd.read_csv(DATA_PATH)
+    df = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
     mem_avant = df.memory_usage(deep=True).sum()
     df_opt    = optimize_memory(df.copy())
     mem_apres = df_opt.memory_usage(deep=True).sum()
@@ -93,7 +93,7 @@ def test_model_production():
     if os.path.exists("models/best_model.pkl"):
         model    = joblib.load("models/best_model.pkl")
         scaler   = joblib.load("models/scaler.pkl")
-        df       = pd.read_csv(DATA_PATH)
+        df = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
         X        = df.drop(columns=['DEATH_EVENT'])
         X_scaled = scaler.transform(X)
         predictions = model.predict(X_scaled)
