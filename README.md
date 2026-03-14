@@ -1,7 +1,7 @@
 # 🫀 CardioAI — Heart Failure Risk Prediction
 
 > Outil clinique d'aide à la décision médicale basé sur le Machine Learning et l'explicabilité SHAP.  
-> **Centrale Casablanca — Coding Week 09-15 Mars 2026 — Equipe 1**
+> **Centrale Casablanca — Coding Week 09-15 Mars 2026 — Equipe 6**
 
 
 
