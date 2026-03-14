@@ -2,23 +2,131 @@
 
 > Outil clinique d'aide à la décision médicale basé sur le Machine Learning et l'explicabilité SHAP.  
 > **Centrale Casablanca — Coding Week 09-15 Mars 2026 — Equipe 6**
-
-
-
 ---
 
-## Table des matières
+## 📋 Table des matières
+- [Quick Start](#-quick-start)
 - [Description](#-description)
 - [Dataset](#-dataset)
 - [Architecture du projet](#-architecture-du-projet)
-- [Installation](#-installation)
-- [Entraînement du modèle](#-entraînement-du-modèle)
-- [Lancer l'application](#-lancer-lapplication)
 - [Fonctionnalités de l'interface](#-fonctionnalités-de-linterface)
 - [Modèles et performances](#-modèles-et-performances)
 - [Dataset — Questions critiques](#-dataset--questions-critiques)
 - [Prompt Engineering](#-prompt-engineering)
 - [Equipe et contributions](#-equipe-et-contributions)
+
+---
+
+##  Quick Start
+
+### Étape 1 — Télécharger le projet
+
+**Option A — Cloner avec Git (recommandé)**
+```bash
+git clone https://github.com/Adegal16/CODING-WEEK.git
+cd CODING-WEEK
+```
+
+**Option B — Télécharger le ZIP**
+1. Allez sur la page GitHub du projet
+2. Cliquez sur le bouton vert **`<> Code`**
+3. Cliquez sur **`Download ZIP`**
+4. Extrayez le dossier sur votre bureau
+5. Ouvrez un terminal dans ce dossier :
+   ```bash
+   cd C:\Users\VOTRE_NOM\Desktop\CODING-WEEK
+   ```
+
+---
+
+### Étape 2 — Installer Python (si pas encore fait)
+
+Vérifiez que Python est installé :
+```bash
+python --version
+```
+
+Si Python n'est pas installé → téléchargez-le sur [python.org](https://www.python.org/downloads/)
+
+---
+
+### Étape 3 — Installer les dépendances
+
+```bash
+pip install -r requirements.txt
+```
+
+**Dépendances installées :**
+```
+streamlit, plotly, pandas, numpy, scikit-learn
+xgboost, lightgbm, imbalanced-learn, shap
+joblib, matplotlib, reportlab, pytest
+```
+
+>  `reportlab` est requis pour la génération du rapport PDF depuis l'onglet **Récapitulatif Patient**.
+
+---
+
+### Étape 4 — Télécharger le dataset
+
+1. Allez sur [UCI Heart Failure Dataset](https://archive.ics.uci.edu/dataset/519/heart%2Bfailure%2Bclinical%2Brecords)
+2. Cliquez sur **`Download`**
+3. Extrayez le fichier `heart_failure_clinical_records_dataset.csv`
+4. Placez-le dans le dossier `data/` du projet
+
+---
+
+### Étape 5 — Entraîner le modèle
+
+```bash
+python src/train_model.py
+```
+
+Ce script effectue automatiquement :
+
+| Etape | Description |
+|-------|-------------|
+| STEP 1 | Chargement de `data/train.csv` et `data/test.csv` |
+| STEP 2 | Application de **SMOTE** sur les données d'entraînement uniquement |
+| STEP 3 | Scaling avec **StandardScaler** (fit sur train, transform sur test) |
+| STEP 4 | Définition des 4 modèles |
+| STEP 5 | Entraînement + évaluation (Accuracy, Precision, Recall, F1, ROC-AUC) |
+| STEP 6 | Sélection du meilleur modèle par **F1-score** |
+| STEP 7 | Sauvegarde dans `models/` avec précision `float64` pour SHAP |
+
+**Fichiers générés dans `models/` :**
+```
+best_model.pkl          ← meilleur modèle entraîné
+scaler.pkl              ← scaler pour l'interface
+X_train_scaled.csv      ← données pour SHAP (float64, 10 décimales)
+model_comparison.csv    ← comparaison des 4 modèles
+```
+
+---
+
+### Étape 6 — Lancer l'application
+
+```bash
+streamlit run app/app.py
+```
+
+Sur Windows :
+```bash
+python -m streamlit run app/app.py
+```
+
+
+
+>  **Version en ligne disponible** : [https://coding-week-pgmxz9hwqgeqvxvtvtvf4s.streamlit.app/](https://coding-week-pgmxz9hwqgeqvxvtvtvf4s.streamlit.app/)
+
+### Modes de fonctionnement automatiques
+
+| Mode | Condition | Prédiction | SHAP |
+|------|-----------|------------|------|
+|  **Démonstration** | `models/` vide | Aléatoire (placeholder) | Simulé (Plotly) |
+|  **Production** | `best_model.pkl` présent | Modèle ML réel | TreeExplainer réel |
+
+Le mode bascule **automatiquement** sans aucune modification du code.
 
 ---
 
@@ -102,90 +210,7 @@ heart-failure-prediction/
 
 ---
 
-##  Installation
-
-### Prérequis
-- Python 3.8+
-- pip
-
-### Installer les dépendances
-
-```bash
-pip install -r requirements.txt
-```
-
-**`requirements.txt` :**
-```
-streamlit
-plotly
-pandas
-numpy
-scikit-learn
-xgboost
-lightgbm
-imbalanced-learn
-shap
-joblib
-matplotlib
-reportlab
-pytest
-```
-
-
-
----
-
-##  Entraînement du modèle
-
-```bash
-python src/train_model.py
-```
-
-| Etape | Description |
-|-------|-------------|
-| STEP 1 | Chargement de `data/train.csv` et `data/test.csv` |
-| STEP 2 | Application de **SMOTE** sur les données d'entraînement uniquement |
-| STEP 3 | Scaling avec **StandardScaler** (fit sur train, transform sur test) |
-| STEP 4 | Définition des 4 modèles |
-| STEP 5 | Entraînement + évaluation (Accuracy, Precision, Recall, F1, ROC-AUC) |
-| STEP 6 | Sélection du meilleur modèle par **F1-score** |
-| STEP 7 | Sauvegarde dans `models/` avec précision `float64` pour SHAP |
-
-**Fichiers générés dans `models/` :**
-```
-best_model.pkl          ← meilleur modèle entraîné
-scaler.pkl              ← scaler pour l'interface
-X_train_scaled.csv      ← données pour SHAP (float64, 10 décimales)
-model_comparison.csv    ← comparaison des 4 modèles
-```
-
----
-
-##  Lancer l'application
-
-```bash
-streamlit run app/app.py
-```
-
-Sur Windows :
-```bash
-python -m streamlit run app/app.py
-```
-
-Accès : **`http://localhost:8501`**
-
-### Modes de fonctionnement automatiques
-
-| Mode | Condition | Prédiction | SHAP |
-|------|-----------|------------|------|
-|  **Démonstration** | `models/` vide | Aléatoire (placeholder) | Simulé (Plotly) |
-|  **Production** | `best_model.pkl` présent | Modèle ML réel | TreeExplainer réel |
-
-Le mode bascule **automatiquement** sans aucune modification du code.
-
----
-
-##  Fonctionnalités de l'interface
+## 🖥️ Fonctionnalités de l'interface de l'interface
 
 ### Sidebar — Saisie patient
 - **7 inputs numériques** : âge, fraction d'éjection, créatinine sérique, sodium sérique, CPK, plaquettes, suivi
@@ -213,7 +238,7 @@ Le mode bascule **automatiquement** sans aucune modification du code.
 
 ---
 
-##  Modèles et performances
+## Modèles et performances
 
 | Modèle | Accuracy | Precision | Recall | F1 | ROC-AUC |
 |--------|----------|-----------|--------|----|---------|
@@ -230,7 +255,7 @@ En médecine, il faut détecter les patients à risque (recall élevé) tout en 
 
 ---
 
-##  Dataset — Questions critiques
+## Dataset — Questions critiques
 
 ### Le dataset était-il équilibré ?
 **Non** — 68% survie / 32% décès. Solution : **SMOTE appliqué uniquement sur les données d'entraînement** pour éviter tout data leakage vers le jeu de test.
@@ -295,12 +320,12 @@ Compatible avec generate_shap_summary() et generate_shap_individual()"
 
 ---
 
-##  Reproductibilité
+## Reproductibilité
 
 ```bash
 # 1. Cloner le repo
-git clone https://github.com/VOTRE_USERNAME/heart-failure-prediction.git
-cd heart-failure-prediction
+git clone https://github.com/Adegal16/CODING-WEEK.git
+cd CODING-WEEK
 
 # 2. Installer les dépendances
 pip install -r requirements.txt
