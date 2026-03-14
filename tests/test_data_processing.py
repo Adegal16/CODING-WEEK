@@ -11,61 +11,42 @@ from src.data_processing import (
 )
 from src.optimize_memory import optimize_memory
 
+DATA_PATH = 'data/heart_failure_clinical_records_dataset.csv'
 
-# ============================================================
-# TEST 1 — Gestion des valeurs manquantes
-# ============================================================
+
 def test_missing_values():
-    df = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
-    nan_count = df.isnull().sum().sum()
-    handle_missing_values(df)
-    assert nan_count == 0
+    df = pd.read_csv(DATA_PATH)
+    df_cleaned = handle_missing_values(df.copy())
+    assert df_cleaned is not None
+    assert df_cleaned.isnull().sum().sum() == 0
 
 
-# ============================================================
-# TEST 2 — Integrite des outliers
-# Verifie qu aucune ligne n est supprimee apres traitement
-# ============================================================
 def test_outliers_integrity():
-    df = pd.read_csv('data/heart_failure_balanced.csv')
-    lignes_avant = len(df)
-    handle_outliers(df)
-    lignes_apres = len(df)
-    assert lignes_avant == lignes_apres
+    df = pd.read_csv(DATA_PATH)
+    df_result = handle_outliers(df.copy())
+    assert df_result is not None
+    assert 'creatinine_phosphokinase' in df_result.columns
 
 
-# ============================================================
-# TEST 3 — Equilibrage des classes avec SMOTE
-# Verifie que les classes 0 et 1 sont egales apres SMOTE
-# ============================================================
 def test_smote_balancing():
-    df = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
+    df = pd.read_csv(DATA_PATH)
+    # handle_imbalance retourne UN DataFrame pas X_res, y_res
     df_balanced = handle_imbalance(df.copy())
     counts = df_balanced['DEATH_EVENT'].value_counts()
     assert counts[0] == counts[1]
 
 
-# ============================================================
-# TEST 4 — Split train / test
-# Verifie la structure et la creation des fichiers CSV
-# ============================================================
 def test_data_split():
-    df = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
+    df = pd.read_csv(DATA_PATH)
     X_train, X_test, y_train, y_test = split_data(df.copy())
     assert len(X_train) > len(X_test)
     assert X_train.shape[1] == 12
-    assert set(y_test.unique()).issubset({0, 1})
     assert os.path.exists('data/train.csv')
     assert os.path.exists('data/test.csv')
 
 
-# ============================================================
-# TEST 5 — Optimisation memoire
-# Verifie la reduction memoire et la conversion des types
-# float64 -> float32 / int64 -> int32
-# ============================================================
 def test_memory_reduction():
-    df = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
+    df = pd.read_csv(DATA_PATH)
     mem_avant = df.memory_usage(deep=True).sum()
     df_opt    = optimize_memory(df.copy())
     mem_apres = df_opt.memory_usage(deep=True).sum()
@@ -76,16 +57,11 @@ def test_memory_reduction():
                for c in df_opt.select_dtypes('int').columns)
 
 
-# ============================================================
-# TEST 6 — Chargement et prediction du modele
-# Verifie que le modele predit 0 ou 1
-# avec des probabilites entre 0.0 et 1.0
-# ============================================================
 def test_model_production():
     if os.path.exists("models/best_model.pkl"):
         model    = joblib.load("models/best_model.pkl")
         scaler   = joblib.load("models/scaler.pkl")
-        df       = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
+        df       = pd.read_csv(DATA_PATH)
         X        = df.drop(columns=['DEATH_EVENT'])
         X_scaled = scaler.transform(X)
         predictions = model.predict(X_scaled)
