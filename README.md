@@ -340,4 +340,4 @@ streamlit run app/app.py
 
 ---
 
-*🫀 CardioAI • Centrale Casablanca • Coding Week Mars 2026 • Equipe 1*
+*🫀 CardioAI • Centrale Casablanca • Coding Week Mars 2026 • Equipe 6*
