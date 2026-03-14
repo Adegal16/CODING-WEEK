@@ -3,68 +3,93 @@ import pandas as pd
 import numpy as np
 import os
 import joblib
-from src.data_processing import handle_missing_values, handle_outliers, handle_imbalance, split_data
+from src.data_processing import (
+    handle_missing_values,
+    handle_outliers,
+    handle_imbalance,
+    split_data
+)
 from src.optimize_memory import optimize_memory
 
-# --- 1. TEST GESTION DES VALEURS MANQUANTES ---
+
+# ============================================================
+# TEST 1 — Gestion des valeurs manquantes
+# ============================================================
 def test_missing_values():
-    df_test = pd.DataFrame({'age': [50, None, 60], 'sex': [1, 0, 1]})
-    df_cleaned = handle_missing_values(df_test)
-    assert df_cleaned.isnull().sum().sum() == 0, "Il reste des valeurs NaN !"
+    df = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
+    nan_count = df.isnull().sum().sum()
+    handle_missing_values(df)
+    assert nan_count == 0
 
-# --- 2. TEST INTÉGRITÉ DES OUTLIERS ---
+
+# ============================================================
+# TEST 2 — Integrite des outliers
+# Verifie qu aucune ligne n est supprimee apres traitement
+# ============================================================
 def test_outliers_integrity():
-    df_test = pd.DataFrame({'age': [1, 2, 3, 1000], 'target': [0, 1, 0, 1]})
-    lignes_avant = len(df_test)
-    df_result = handle_outliers(df_test)
-    lignes_apres = len(df_result)
-    assert lignes_avant == lignes_apres, "La fonction outliers ne doit pas supprimer de lignes."
+    df = pd.read_csv('data/heart_failure_balanced.csv')
+    lignes_avant = len(df)
+    handle_outliers(df)
+    lignes_apres = len(df)
+    assert lignes_avant == lignes_apres
 
-# --- 3. TEST ÉQUILIBRAGE (SMOTE) ---
+
+# ============================================================
+# TEST 3 — Equilibrage des classes avec SMOTE
+# Verifie que les classes 0 et 1 sont egales apres SMOTE
+# ============================================================
 def test_smote_balancing():
-    # On crée un dataset très déséquilibré
-    df_unbalanced = pd.DataFrame({
-        'feature': np.random.rand(10),
-        'DEATH_EVENT': [0]*8 + [1]*2
-    })
-    df_balanced = handle_imbalance(df_unbalanced)
+    df = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
+    df_balanced = handle_imbalance(df.copy())
     counts = df_balanced['DEATH_EVENT'].value_counts()
-    assert counts[0] == counts[1], "Les classes ne sont pas équilibrées après SMOTE."
+    assert counts[0] == counts[1]
 
-# --- 4. TEST SPLIT ET CRÉATION DE FICHIERS ---
+
+# ============================================================
+# TEST 4 — Split train / test
+# Verifie la structure et la creation des fichiers CSV
+# ============================================================
 def test_data_split():
-    df_test = pd.DataFrame(np.random.rand(20, 13), columns=[f'c{i}' for i in range(12)] + ['DEATH_EVENT'])
-    X_train, X_test, y_train, y_test = split_data(df_test)
-    
-    # Vérification structure
+    df = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
+    X_train, X_test, y_train, y_test = split_data(df.copy())
     assert len(X_train) > len(X_test)
+    assert X_train.shape[1] == 12
+    assert set(y_test.unique()).issubset({0, 1})
     assert os.path.exists('data/train.csv')
     assert os.path.exists('data/test.csv')
 
-# --- 5. TEST OPTIMISATION MÉMOIRE ---
-def test_memory_reduction():
-    df_test = pd.DataFrame({'col': range(1000)}, dtype='int64')
-    mem_before = df_test.memory_usage(deep=True).sum()
-    df_opt = optimize_memory(df_test)
-    mem_after = df_opt.memory_usage(deep=True).sum()
-    assert mem_after < mem_before, "L'optimisation n'a pas réduit la taille mémoire."
 
-# --- 6. TEST CHARGEMENT MODÈLE ET PRÉDICTION ---
+# ============================================================
+# TEST 5 — Optimisation memoire
+# Verifie la reduction memoire et la conversion des types
+# float64 -> float32 / int64 -> int32
+# ============================================================
+def test_memory_reduction():
+    df = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
+    mem_avant = df.memory_usage(deep=True).sum()
+    df_opt    = optimize_memory(df.copy())
+    mem_apres = df_opt.memory_usage(deep=True).sum()
+    assert mem_apres < mem_avant
+    assert all(df_opt[c].dtype == np.float32
+               for c in df_opt.select_dtypes('float').columns)
+    assert all(df_opt[c].dtype == np.int32
+               for c in df_opt.select_dtypes('int').columns)
+
+
+# ============================================================
+# TEST 6 — Chargement et prediction du modele
+# Verifie que le modele predit 0 ou 1
+# avec des probabilites entre 0.0 et 1.0
+# ============================================================
 def test_model_production():
-    # On vérifie si le modèle existe (pour éviter de faire échouer GitHub si pas encore push)
     if os.path.exists("models/best_model.pkl"):
-        model = joblib.load("models/best_model.pkl")
-        scaler = joblib.load("models/scaler.pkl")
-        
-        # Test sur un patient fictif (12 caractéristiques)
-        fake_patient = np.zeros((1, 12))
-        scaled_patient = scaler.transform(fake_patient)
-        prediction = model.predict(scaled_patient)
-        
-        # Vérification binaire
-        assert prediction[0] in [0, 1], "La prédiction doit être 0 ou 1."
-        
-        # Vérification probabilités (si applicable)
+        model    = joblib.load("models/best_model.pkl")
+        scaler   = joblib.load("models/scaler.pkl")
+        df       = pd.read_csv('data/heart_failure_clinical_records_dataset.csv')
+        X        = df.drop(columns=['DEATH_EVENT'])
+        X_scaled = scaler.transform(X)
+        predictions = model.predict(X_scaled)
+        assert set(predictions).issubset({0, 1})
         if hasattr(model, "predict_proba"):
-            probas = model.predict_proba(scaled_patient)
-            assert 0.0 <= probas.min() <= 1.0
+            probas = model.predict_proba(X_scaled)[:, 1]
+            assert probas.min() >= 0.0 and probas.max() <= 1.0

@@ -23,6 +23,7 @@ def handle_missing_values(df):
         print()
         for row, col in positions:
             print(f'   → Ligne {row} | Colonne : {df.columns[col]}')
+    return df
 
 def handle_outliers(df):
     # Détection simple des outliers
@@ -37,6 +38,7 @@ def handle_outliers(df):
 
       print(f'{col:35s} →  {n_2:3d}')
     print("conserver (données médicales réelles)")
+    return df
     
 def apply_smote(X, y):
     """SMOTE pour équilibrer les classes."""
@@ -159,7 +161,7 @@ print()
 print('=' * 50)
 print('   PIPELINE TERMINÉ AVEC SUCCÈS !')
 print('=' * 50)
-
+#END
 
 
 
