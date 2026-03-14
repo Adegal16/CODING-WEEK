@@ -247,7 +247,7 @@ heart-failure-prediction/
 | XGBoost | 0.9024| 0.9231 | 0.878 | 0.9 | 0.9024 |
 | LightGBM | 0.9146| 0.925 | 0.9024 | 0.9136 | 0.9146 |
 
-> Remplir après `python src/train_model.py` — résultats dans `models/model_comparison.csv`
+
 
 **Critère de sélection : F1-score**
 
