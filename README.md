@@ -242,10 +242,10 @@ heart-failure-prediction/
 
 | Modèle | Accuracy | Precision | Recall | F1 | ROC-AUC |
 |--------|----------|-----------|--------|----|---------|
-| Logistic Regression | - | - | - | - | - |
-| Random Forest | - | - | - | - | - |
-| XGBoost | - | - | - | - | - |
-| LightGBM | - | - | - | - | - |
+| Logistic Regression | 0.7927 | 0.8333 | 0.7317 | 0.7792 | 0.7927 |
+| Random Forest | 0.9146 | 0.9048 |  0.9268| 0.9157 | 0.9146 |
+| XGBoost | 0.9024| 0.9231 | 0.878 | 0.9 | 0.9024 |
+| LightGBM | 0.9146| 0.925 | 0.9024 | 0.9136 | 0.9146 |
 
 > Remplir après `python src/train_model.py` — résultats dans `models/model_comparison.csv`
 
