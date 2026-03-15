@@ -32,7 +32,7 @@ def test_missing_values():
 
 
 # ============================================================
-# TEST 2 - Integrite des outliers
+# TEST 2 -  Integrite des outliers
 # Verifie qu aucune ligne n est supprimee apres traitement
 # ============================================================
 def test_outliers_integrity():
