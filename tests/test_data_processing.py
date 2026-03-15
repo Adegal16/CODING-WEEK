@@ -12,7 +12,7 @@ from src.data_processing import (
 )
 from src.optimize_memory import optimize_memory
 
-# Telecharger le dataset depuis UCI si absent
+# Telecharger le dataset depuis UCI si absent 
 URL = "https://archive.ics.uci.edu/ml/machine-learning-databases/00519/heart_failure_clinical_records_dataset.csv"
 DATA_PATH = "data/heart_failure_clinical_records_dataset.csv"
 
