@@ -1,6 +1,6 @@
 """
 app.py - Heart Failure Risk Prediction
-Interface Streamlit - Phase finale
+Interface Streamlit - Phase finale 
 Modèle : models/best_model.pkl + models/scaler.pkl
 SHAP   : models/X_train_scaled.csv + src/evaluate_model.py
 """
