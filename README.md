@@ -1,4 +1,4 @@
-[![Trello](https://img.shields.io/badge/Trello-%23026AA7.svg?style=for-the-badge&logo=Trello&logoColor=white)](https://trello.com/b/5IPikN12/avancement-des-tache-pendant-le-coding-week)
+[![Trello](https://img.shields.io/badge/Trello-%23026AA7.svg?style=for-the-badge&logo=Trello&logoColor=white)](https://trello.com/invite/b/69b00fda08495cff5ca73112/ATTI40da9139939b8c0f52026e0b305fd734CF85BB09/avancement-des-tache-pendant-le-coding-week)
 # 🫀 CardioAI — Heart Failure Risk Prediction
 
 > Outil clinique d'aide à la décision médicale basé sur le Machine Learning et l'explicabilité SHAP.  
